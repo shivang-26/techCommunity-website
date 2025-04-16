@@ -18,6 +18,7 @@ const Login = () => {
       const response = await fetch("http://localhost:5000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -86,9 +87,11 @@ const Login = () => {
         <div className="hidden md:flex w-1/2 h-full">
           <img src={loginBanner} alt="Login Banner" className="w-full h-full object-cover" />
         </div>
-
+      
       </div>
     </div>
+    
+    
   );
 };
 

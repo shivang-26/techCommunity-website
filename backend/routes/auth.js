@@ -41,11 +41,12 @@ router.post("/register", async (req, res) => {
       return res.status(409).json({ message: "User already exists. Try logging in." });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    
 
     // ✅ Save user as NOT verified
-    const newUser = new User({ username, email, password: hashedPassword, isVerified: false });
+    const newUser = new User({ username, email, password, isVerified: false });
+    
+
     await newUser.save();
 
     // ✅ Generate OTP
@@ -105,6 +106,7 @@ router.post("/verify-otp", async (req, res) => {
         return res.status(500).json({ message: "Session error" });
       }
       res.status(200).json({ message: "Email verified! Redirecting to dashboard.", user: req.session.user });
+      
     });
   } catch (error) {
     console.error("❌ OTP Verification Error:", error);
@@ -134,6 +136,7 @@ router.post("/login", async (req, res) => {
 
     // ✅ Validate password
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
