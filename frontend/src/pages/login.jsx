@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import loginBanner from "../assets/register&login.png";
 import Footer from "../components/footer";
+import { UserContext } from "../context/Usercontext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { user, setUser, fetchUser } = useContext(UserContext);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,6 +31,8 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      setUser(data.user);
+      await fetchUser();
       navigate("/dashboard"); // Redirect to dashboard
     } catch (err) {
       setError(err.message);

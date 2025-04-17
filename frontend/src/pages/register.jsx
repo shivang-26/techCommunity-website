@@ -1,32 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import registerlogin from "../assets/register&login.png";
 import Footer from "../components/footer";
+import { UserContext } from "../context/Usercontext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    confirmPassword: "", // Added confirmPassword field
+    confirmPassword: "",
   });
   const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1); // Step 1: Register, Step 2: OTP Verification
+  const [step, setStep] = useState(1);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
+  const { user, setUser, fetchUser } = useContext(UserContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Step 1: Register & Send OTP
   const handleRegister = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -39,22 +39,21 @@ const Register = () => {
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
-          password: formData.password, // Only send password, not confirmPassword
+          password: formData.password,
         }),
-        credentials: "include", // Ensure cookies are sent
+        credentials: "include",
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
 
       setSuccess("OTP sent to your email. Verify to continue.");
-      setStep(2); // Move to OTP verification step
+      setStep(2);
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // Step 2: Verify OTP and Complete Registration
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     setError(null);
@@ -65,7 +64,7 @@ const Register = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email, otp }),
-        credentials: "include", // Ensure cookies are sent
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -80,15 +79,54 @@ const Register = () => {
     }
   };
 
+  // ✅ Handle Google Sign-Up
+  const handleGoogleResponse = async (response) => {
+    try {
+      const res = await fetch("http://localhost:5000/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ credential: response.credential }),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      setUser(data.user);
+      await fetchUser();
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // ✅ Render Google Button
+  useEffect(() => {
+    if (window.google && step === 1) {
+      window.google.accounts.id.initialize({
+        client_id: "YOUR_GOOGLE_CLIENT_ID", // Replace this with your actual client ID
+        callback: handleGoogleResponse,
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleSignUpBtn"),
+        { theme: "outline", size: "large", width: "100%" }
+      );
+    }
+  }, [step]);
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="flex shadow-lg rounded-lg overflow-hidden w-[850px] h-[500px] bg-white">
-        {/* Left Side - Image */}
         <div className="w-1/2 hidden md:block">
           <img src={registerlogin} alt="Register Banner" className="w-full h-full object-cover" />
         </div>
 
-        {/* Right Side - Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center p-8">
           {step === 1 && (
             <>
@@ -141,6 +179,11 @@ const Register = () => {
                   Sign Up
                 </button>
               </form>
+
+              {/* ✅ Google Sign-Up Button */}
+              <div className="mt-4">
+                <div id="googleSignUpBtn" className="flex justify-center"></div>
+              </div>
             </>
           )}
 

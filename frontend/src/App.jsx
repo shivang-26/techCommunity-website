@@ -17,6 +17,7 @@ import PlacementPrep from "./pages/placementprep";
 import Forum from "./pages/forum";
 import Dashboard from "./pages/dashboard";
 import ProtectedRoute from "./components/protectedRoute";
+import { UserProvider } from "./context/Usercontext";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -37,6 +38,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <UserProvider>
       {/* Pass user and setUser to Navbar */}
       <Navbar user={user} setUser={setUser} />
 
@@ -73,6 +75,7 @@ export default function App() {
           />
         </Routes>
       )}
+      </UserProvider>
     </BrowserRouter>
   );
 }

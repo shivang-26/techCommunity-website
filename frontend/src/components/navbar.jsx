@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { AiOutlineClose, AiOutlineMenu, AiOutlineDown } from "react-icons/ai"; // Add the dropdown arrow icon
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo1.png";
 import axios from "axios";
+import { UserContext } from "../context/Usercontext";
+
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
-  const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const { user, setUser, fetchUser } = useContext(UserContext);
 
   const handleNav = () => setNav(!nav);
 

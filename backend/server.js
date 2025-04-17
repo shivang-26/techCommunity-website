@@ -27,9 +27,13 @@ app.use(sessionMiddleware);
 
 // ✅ MongoDB Connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    tls: true, // Required for MongoDB Atlas (or ssl: true for older setups)
+  })
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+
+
 
 // Routes
 app.use("/auth", authRoutes);
