@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/auth/me", { withCredentials: true })
+      .get("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/me", { withCredentials: true })
       .then((res) => {
         setUser(res.data.user);
         if (res.data.user?.profilePic) {
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5000/auth/logout", {}, { withCredentials: true });
+      await axios.post("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/logout", {}, { withCredentials: true });
       setUser(null);
       navigate("/login");
     } catch (err) {
@@ -51,7 +51,7 @@ const Dashboard = () => {
       formData.append("profilePic", file);
   
       axios
-        .post("http://localhost:5000/auth/upload-profile-pic", formData, {
+        .post("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/upload-profile-pic", formData, {
           withCredentials: true,
         })
         .then((res) => {

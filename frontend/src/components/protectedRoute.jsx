@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/auth/me", { withCredentials: true })
+      .get("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/me", { withCredentials: true })
       .then(() => setIsAuthenticated(true))
       .catch(() => setIsAuthenticated(false));
   }, []);

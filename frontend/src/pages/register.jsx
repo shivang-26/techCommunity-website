@@ -33,7 +33,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/auth/register", {
+      const response = await fetch("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -60,7 +60,7 @@ const Register = () => {
     setSuccess(null);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/verify-otp", {
+      const response = await fetch("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email, otp }),
@@ -82,7 +82,7 @@ const Register = () => {
   // ✅ Handle Google Sign-Up
   const handleGoogleResponse = async (response) => {
     try {
-      const res = await fetch("http://localhost:5000/auth/google", {
+      const res = await fetch("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/google", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

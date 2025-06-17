@@ -27,7 +27,7 @@ const Navbar = () => {
   // Fetch authenticated user
   useEffect(() => {
     axios
-      .get("http://localhost:5000/auth/me", { withCredentials: true })
+      .get("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/me", { withCredentials: true })
       .then((res) => {
         setUser(res.data.user);
       })
@@ -38,7 +38,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5000/auth/logout", {}, { withCredentials: true });
+      await axios.post("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/logout", {}, { withCredentials: true });
       setUser(null);
       navigate("/login");
     } catch (err) {
@@ -106,7 +106,7 @@ const Navbar = () => {
                     className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    Profile
+                    User Dashboard
                   </Link>
                   <button
                     onClick={handleLogout}

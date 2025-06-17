@@ -4,6 +4,7 @@ const session = require("express-session");
 const User = require("../models/User");
 const sendOTP = require("../services/mailService");
 const OTP = require("../models/OTP");
+const axios = require("axios"); // Import axios
 
 const router = express.Router();
 
@@ -191,6 +192,75 @@ const isAuthenticated = (req, res, next) => {
 // ✅ Example: Protected Route (User Dashboard)
 router.get("/dashboard", isAuthenticated, (req, res) => {
   res.status(200).json({ message: "Welcome to your dashboard", user: req.session.user });
+});
+
+// ✅ Google OAuth Callback
+router.post("/auth/google", async (req, res) => {
+  try {
+    const { googleToken } = req.body; // This is the authorization code
+
+    if (!googleToken) {
+      return res.status(400).json({ message: "Google authorization code missing." });
+    }
+
+    // Exchange authorization code for tokens
+    const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+      code: googleToken,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI, // This should match what you configured in Google Cloud Console
+      grant_type: 'authorization_code',
+    });
+
+    const { access_token, id_token } = tokenResponse.data;
+
+    // Get user info from Google with the id_token
+    const googleUserResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    const googleUser = googleUserResponse.data;
+
+    let user = await User.findOne({ email: googleUser.email });
+
+    if (user) {
+      // User exists, log them in
+      req.session.user = { id: user._id, username: user.username, email: user.email, isVerified: user.isVerified };
+      req.session.save((err) => {
+        if (err) {
+          console.error("❌ Session Save Error:", err);
+          return res.status(500).json({ message: "Session error" });
+        }
+        res.status(200).json({ message: "Login successful!", user: req.session.user });
+      });
+    } else {
+      // New user, register them
+      const newUser = new User({
+        username: googleUser.name,
+        email: googleUser.email,
+        // For Google authenticated users, we might not store a traditional password
+        // You might generate a random password or mark it as social login
+        password: "", // Or generate a random one if needed for schema validation
+        isVerified: true, // Google users are considered verified
+        googleId: googleUser.sub, // Google's unique user ID
+        profilePic: googleUser.picture, // Google profile picture
+      });
+
+      await newUser.save();
+
+      req.session.user = { id: newUser._id, username: newUser.username, email: newUser.email, isVerified: newUser.isVerified };
+      req.session.save((err) => {
+        if (err) {
+          console.error("❌ Session Save Error:", err);
+          return res.status(500).json({ message: "Session error" });
+        }
+        res.status(200).json({ message: "Registration and Login successful!", user: req.session.user });
+      });
+    }
+
+  } catch (error) {
+    console.error("❌ Google Auth Error:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data?.error_description || "Google authentication failed." });
+  }
 });
 
 module.exports = router;

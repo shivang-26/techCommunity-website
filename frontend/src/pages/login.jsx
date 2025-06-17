@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import loginBanner from "../assets/register&login.png";
 import Footer from "../components/footer";
 import { UserContext } from "../context/Usercontext";
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ const Login = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/login", {
+      const response = await fetch("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -74,10 +75,9 @@ const Login = () => {
           <div className="mt-4 text-center text-gray-500">or</div>
 
           {/* Google Login */}
-          <button className="w-full flex items-center justify-center gap-2 border py-2 rounded-lg hover:bg-gray-100 transition mt-3">
-            <FcGoogle size={22} />
-            Sign In with Google
-          </button>
+          <div className="mt-6">
+            <GoogleSignInButton mode="login" />
+          </div>
 
           {/* Register Link */}
           <p className="mt-4 text-sm text-center">
