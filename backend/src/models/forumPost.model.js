@@ -16,6 +16,29 @@ const forumPostSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add some content']
   },
+  votes: {
+    type: Number,
+    default: 0
+  },
+  votedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  answers: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    answer: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   // You might want to add fields for replies/comments later
 }, {
   timestamps: true // Adds createdAt and updatedAt timestamps

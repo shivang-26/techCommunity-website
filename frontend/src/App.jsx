@@ -18,72 +18,75 @@ import Forum from "./pages/forum";
 import Dashboard from "./pages/dashboard";
 import ProtectedRoute from "./components/protectedRoute";
 import { UserProvider } from "./context/Usercontext";
-import ChatbotInterface from './features/chatbot/ChatbotInterface';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import ChangePassword from "./pages/change-password";
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
-  const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/me", { withCredentials: true })
-      .then((res) => {
-        setUser(res.data.user);
+    const checkUser = async () => {
+      try {
+        await axios.get("/api/auth/me", { withCredentials: true });
+      } catch (error) {
+        // User not authenticated, that's okay
+      } finally {
         setLoadingUser(false);
-      })
-      .catch(() => {
-        setUser(null);
-        setLoadingUser(false);
-      });
+      }
+    };
+    
+    checkUser();
   }, []);
 
-  // Add this console log
-  console.log('Google Client ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
-        <UserProvider>
-        {/* Pass user and setUser to Navbar */}
-        <Navbar user={user} setUser={setUser} />
+    <BrowserRouter>
+      <UserProvider>
+      {/* Navbar will get user from UserContext */}
+      <Navbar />
 
-        {/* Optional: Add loading spinner if needed */}
-        {!loadingUser && (
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <>
-                  <Hero />
-                  <Features />
-                  <HowItWorks />
-                  <Testimonials />
-                  <CTA />
-                  <Faq />
-                  <Footer />
-                </>
-              }
-            />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/about" element={<AboutSection />} />
-            <Route path="/cheatsheets" element={<CheatSheetsPage />} />
-            <Route path="/placementprep" element={<PlacementPrep />} />
-            <Route path="/forum" element={<Forum />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/chatbot" element={<ChatbotInterface />} />
-          </Routes>
-        )}
-        </UserProvider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+      {/* Optional: Add loading spinner if needed */}
+      {!loadingUser && (
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Hero />
+                <Features />
+                <HowItWorks />
+                <Testimonials />
+                <CTA />
+                <Faq />
+                <Footer />
+              </>
+            }
+          />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/about" element={<AboutSection />} />
+          <Route path="/cheatsheets" element={<CheatSheetsPage />} />
+          <Route path="/placementprep" element={<PlacementPrep />} />
+          <Route path="/forum" element={<Forum />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/change-password"
+            element={
+              <ProtectedRoute>
+                <ChangePassword />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
+      )}
+      </UserProvider>
+    </BrowserRouter>
   );
 }

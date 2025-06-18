@@ -17,32 +17,27 @@ const Navbar = () => {
 
   const navItems = [
     { id: 1, text: "Home", path: "/" },
-    { id: 2, text: "Portfolio", path: "/about" },
-    { id: 3, text: "Cheat Sheets", path: "/cheatsheets" },
-    { id: 4, text: "Placement Prep", path: "/placementprep" },
-    { id: 5, text: "Forum", path: "/forum" },
-    { id: 6, text: "API", path: "/api" },
+    { id: 2, text: "Cheat Sheets", path: "/cheatsheets" },
+    // { id: 3, text: "Placement Prep", path: "/placementprep" },
+    { id: 4, text: "Community", path: "/forum" },
+    { id: 5, text: "About", path: "/about" },
+    // { id: 6, text: "API", path: "/api" },
   ];
 
   // Fetch authenticated user
   useEffect(() => {
-    axios
-      .get("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/me", { withCredentials: true })
-      .then((res) => {
-        setUser(res.data.user);
-      })
-      .catch(() => {
-        setUser(null);
-      });
+    fetchUser();
   }, []);
 
   const handleLogout = async () => {
     try {
-      await axios.post("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/logout", {}, { withCredentials: true });
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       setUser(null);
-      navigate("/login");
-    } catch (err) {
-      console.error("Logout failed:", err);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   };
 
@@ -90,9 +85,9 @@ const Navbar = () => {
               >
                 {/* Profile Picture */}
                 <img
-                  src={user.profilePicture || "/default-profile.png"}
+                  src={user && (user._id || user.id) ? `/api/auth/profile-picture/${user._id || user.id}` : "/default-profile.png"}
                   alt="Profile"
-                  className="h-8 w-8 rounded-full object-cover mr-2" // Add margin-right to profile picture
+                  className="h-8 w-8 rounded-full object-cover mr-2"
                 />
                 {/* User Name */}
                 <span>{user.username}</span>
@@ -135,7 +130,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       <ul
-        className={`fixed md:hidden top-0 left-0 w-[70%] h-full bg-white shadow-lg border-r border-gray-200 transition-transform duration-500 ${
+        className={`fixed md:hidden top-0 left-0 w-[70%] h-full bg-white z-50 shadow-lg border-r border-gray-200 transition-transform duration-500 ${
           nav ? "translate-x-0" : "-translate-x-full"
         }`}
       >

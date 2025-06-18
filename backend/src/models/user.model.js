@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
-    name: {
+    username: {
         type: String,
-        required: [true, 'Name is required'],
+        required: [true, 'Username is required'],
         trim: true
     },
     email: {
@@ -32,8 +33,11 @@ const userSchema = new mongoose.Schema({
         default: 'local'
     },
     profilePicture: {
-        type: String,
-        default: ''
+        type: Buffer,
+        default: null
+    },
+    profilePictureType: {
+        type: String
     },
     role: {
         type: String,
@@ -68,6 +72,13 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.comparePassword = async function(candidatePassword) {
     if (!this.password) return false;
     return bcrypt.compare(candidatePassword, this.password);
+};
+
+// Generate authentication token
+userSchema.methods.generateAuthToken = function () {
+    return jwt.sign({ _id: this._id, email: this.email }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+    });
 };
 
 const User = mongoose.model('User', userSchema);

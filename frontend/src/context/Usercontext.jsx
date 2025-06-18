@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
   const fetchUser = async () => {
     console.log('UserContext: Attempting to fetch user...');
     try {
-      const res = await axios.get("${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/auth/me", { withCredentials: true });
+      const res = await axios.get("/api/auth/me", { withCredentials: true });
       setUser(res.data.user);
       console.log('UserContext: User fetched successfully:', res.data.user);
     } catch (error) {

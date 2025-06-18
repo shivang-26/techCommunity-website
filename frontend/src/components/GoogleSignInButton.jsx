@@ -15,7 +15,7 @@ const GoogleSignInButton = ({ mode = 'login' }) => {
       setError(null);
       console.log('Google response:', response); // Debug log
       
-      const res = await axios.post('${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/auth/google', {
+      const res = await axios.post('/api/auth/google', {
         googleToken: response.code // Changed from access_token to code
       }, {
         withCredentials: true
