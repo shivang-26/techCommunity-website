@@ -18,10 +18,16 @@
     "seed": "node src/scripts/seed.js",
     "create-admin": "node src/scripts/create-admin.js"
   },
-  "keywords": ["tech-community", "forum", "authentication", "otp"],
+  "keywords": [
+    "tech-community",
+    "forum",
+    "authentication",
+    "otp"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
