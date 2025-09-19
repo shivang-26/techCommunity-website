@@ -18,7 +18,8 @@
     
     # Copy frontend build into backend's public folder
     RUN mkdir -p /app/backend/public
-    COPY --from=build-frontend /app/frontend/build /app/backend/public
+    COPY --from=build-frontend /app/frontend/dist /app/backend/public
+
     
     # Expose port (Render will map it automatically)
     EXPOSE 8080
