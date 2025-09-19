@@ -25,5 +25,5 @@
     EXPOSE 8080
     
     # Start backend (Express)
-    CMD ["node", "src/app.js"]
+    CMD ["node", "server.js"]
     
